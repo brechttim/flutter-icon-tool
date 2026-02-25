@@ -83,6 +83,61 @@ def generate_android_icons(input_path, project_path):
     print("android icons generated.")
 
 
+def generate_macos_icons(input_path, project_path):
+    macosloc = os.path.join(
+        project_path,
+        "macos/Runner/Assets.xcassets/AppIcon.appiconset"
+    )
+
+    if not os.path.exists(macosloc):
+        print("macos appicon directory not found.")
+        return
+
+    img = cv2.imread(input_path)
+
+    sizes = {
+        "app_icon_16.png": 16,
+        "app_icon_32.png": 32,
+        "app_icon_64.png": 64,
+        "app_icon_128.png": 128,
+        "app_icon_256.png": 256,
+        "app_icon_512.png": 512,
+        "app_icon_1024.png": 1024,
+    }
+
+    for filename, size in sizes.items():
+        resized = cv2.resize(img, (size, size), interpolation=cv2.INTER_CUBIC)
+        cv2.imwrite(os.path.join(macosloc, filename), resized)
+
+    print("macos icons generated.")
+
+
+def generate_linux_icons(input_path, project_path):
+    linuxloc = os.path.join(
+        project_path,
+        "linux"
+    )
+
+    if not os.path.exists(linuxloc):
+        print("linux directory not found.")
+        return
+
+    img = cv2.imread(input_path)
+
+    # flutter linux typically uses 512x512
+    resized = cv2.resize(img, (512, 512), interpolation=cv2.INTER_CUBIC)
+
+    icon_path = os.path.join(
+        project_path,
+        "linux/assets/icon.png"
+    )
+
+    os.makedirs(os.path.dirname(icon_path), exist_ok=True)
+    cv2.imwrite(icon_path, resized)
+
+    print("linux icon generated.")
+
+
 def main():
     if len(sys.argv) != 3:
         print("usage: python app.py <input image> <flutter project directory>")
@@ -105,8 +160,10 @@ def main():
 
     generate_ios_icons(input_path, project_path)
     generate_android_icons(input_path, project_path)
+    generate_macos_icons(input_path, project_path)
+    generate_linux_icons(input_path, project_path)
 
-    print("all icons successfully generated.")
+    print("all platform icons generated.")
 
 
 if __name__ == "__main__":
